@@ -55,7 +55,6 @@ export function Slash(options: SlashOptions) {
   // event that runs when user executes command
   this.executeCommand = (e) => {
     if (e.keyCode === 9) {
-      console.log("i run...");
       e.preventDefault();
       const update = currentContext.command.executeCommand(currentContext);
       if (!update) return;

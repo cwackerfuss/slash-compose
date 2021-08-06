@@ -16,7 +16,7 @@ const getTooltipInstance = (target: SlashTarget) => {
 const createTooltipText = ({ command, match }: CommandContext) =>
   `/${command.id} ${createParamHints(command.params)} (${
     command.description
-  }) - ${match.isValid ? "Tab to apply" : "Not ready..."}`;
+  }) - ${match.isValid ? "Tab to apply" : "Add more args..."}`;
 
 export const defaultOnContextChange: OnContextChangeFn = (ctx, target) => {
   const tooltip = getTooltipInstance(target);
