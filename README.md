@@ -11,6 +11,7 @@ A small library written in vanilla Typescript that enables customizable slash co
 - Define command parameters with flexible regex matching.
 - Optionally update any text in the input area -- you're not limited to only operating on the slash command and its parameters!
 - Override the change handler to trigger your own behavior.
+- Dependency free (okay, Tippy is used in the demo for the default tooltip but that can easily be abstracted out)
 
 ## Run the demo
 
