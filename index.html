@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Slash Compose Demo</title>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="src/styles.css" />
-  </head>
 
-  <body>
-    <div class="container">
-      <h1>Slash Compose Demo</h1>
-      <p>
-        A small library written in vanilla Typescript that enables customizable
-        slash commands in any input field!
-      </p>
-      <textarea id="hey"></textarea>
+<head>
+  <title>Slash Compose Demo</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
 
-      <h3>
-        Try some commands:
-      </h3>
-      <ul>
-        <li><code>add</code> - Add two numbers together</li>
-        <li><code>repeat</code> - Repeats a string n number of times</li>
-        <li><code>upperWordBefore</code> - Uppercase the previous word</li>
-        <li><code>upper</code> - Uppercase everything after the command</li>
-        <li><code>surprise</code> - Roll the dice!</li>
-      </ul>
-    </div>
+<body>
+  <div class="container">
+    <h1>Slash Compose Demo</h1>
+    <p>
+      A small library written in vanilla Typescript that enables customizable
+      slash commands in any input field!
+    </p>
+    <textarea>/add 1 2</textarea>
 
-    <script src="src/index.ts"></script>
-  </body>
+    <h3>
+      Try some commands:
+    </h3>
+    <ul>
+      <li><code>add</code> - Add two numbers together</li>
+      <li><code>repeat</code> - Repeats a string n number of times</li>
+      <li><code>upperWordBefore</code> - Uppercase the previous word</li>
+      <li><code>upper</code> - Uppercase everything after the command</li>
+      <li><code>surprise</code> - Roll the dice!</li>
+    </ul>
+  </div>
+
+  <script src="src/index.ts"></script>
+</body>
+
 </html>

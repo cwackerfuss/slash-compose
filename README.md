@@ -4,10 +4,11 @@ A small library written in vanilla Typescript that enables customizable slash co
 
 ## Features
 
-- Define commands either synchronously or later on
-- Initialize the library on any `input` or `textarea`
-- Tab to execute valid command
-- Define command parameters with flexible regex matching
+- Define commands either synchronously or later on.
+- Initialize the library on any `input` or `textarea`.
+- Tab to execute valid command.
+- Positions cursor correctly after a command is executed.
+- Define command parameters with flexible regex matching.
 - Optionally update any text in the input area -- you're not limited to only operating on the slash command and its parameters!
 - Override the change handler to trigger your own behavior.
 
