@@ -11,6 +11,10 @@ A small library written in vanilla Typescript that enables customizable slash co
 - Optionally update any text in the input area -- you're not limited to only operating on the slash command and its parameters!
 - Override the change handler to trigger your own behavior.
 
+## Run the demo
+
+- Download project, then `npm i` and `npm run start`
+
 ## How to use
 
 - Define some commands
