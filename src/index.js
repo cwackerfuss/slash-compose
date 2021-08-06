@@ -1,16 +1,3 @@
-// function selectElementContents(el: Node) {
-//   var range = document.createRange();
-//   range.selectNodeContents(el);
-//   range.selectNodeContents(el);
-//   var sel = window.getSelection();
-//   if (sel) {
-//     console.log(sel);
-//     sel.removeAllRanges();
-//     sel.addRange(range);
-//     return sel;
-//   }
-// }
-
 const NUMBER_ARG_REGEX_PARTIAL = "[0-9]+";
 const WORD_ARG_REGEX_PARTIAL = '[^" /]*';
 const QUOTED_ARG_REGEX_PARTIAL = '"[^/"]*"';
@@ -138,18 +125,6 @@ const getSlashCommand = (str, pos) => {
   const command = findCommand(info.id);
 
   if (!command) return null;
-
-  // these rough arg matchers can
-  // be abstracted!
-  // const argRegex = command.arguments
-  //   ? `(${QUOTED_ARG_REGEX_PARTIAL_W_SPACE}|${STANDARD_ARG_REGEX_PARTIAL_W_SPACE}){0,${command.arguments.length}}`
-  //   : "";
-
-  // const argRegexList = (command.arguments || []).map((arg, i) =>
-  //   i === command.arguments.length - 1
-  //     ? `(${QUOTED_ARG_REGEX_PARTIAL}|${STANDARD_ARG_REGEX_PARTIAL})`
-  //     : `(${QUOTED_ARG_REGEX_PARTIAL_W_SPACE}|${STANDARD_ARG_REGEX_PARTIAL_W_SPACE})`
-  // );
 
   // this wraps each argument's `match` regex partials
   // with whitespace and parens according to their position
