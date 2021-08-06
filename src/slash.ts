@@ -23,10 +23,11 @@ export function Slash(options: SlashOptions) {
     const { value, selectionStart } = e.target;
     currentContext = this.getCommandContext(value, selectionStart);
 
-    if (currentContext) {
-      if (currentContext.match.isValid) {
-        target.addEventListener("keydown", this.executeCommand);
-      }
+    // if there's a command that can be run,
+    // allow the user to execute the command,
+    // otherwise unmount the event listener
+    if (currentContext && currentContext.match.isValid) {
+      target.addEventListener("keydown", this.executeCommand);
     } else {
       target.removeEventListener("keydown", this.executeCommand);
     }
@@ -34,6 +35,8 @@ export function Slash(options: SlashOptions) {
     onContextChange(currentContext, target);
   };
 
+  // find the relevant command based on user cursor position,
+  // and assemble any data we may need to process the command
   this.getCommandContext = (
     inputText: string,
     cursorPos: number
@@ -49,9 +52,10 @@ export function Slash(options: SlashOptions) {
     return parseCommandContext(command, raw);
   };
 
-  // event that runs when
+  // event that runs when user executes command
   this.executeCommand = (e) => {
     if (e.keyCode === 9) {
+      console.log("i run...");
       e.preventDefault();
       const update = currentContext.command.executeCommand(currentContext);
       if (!update) return;

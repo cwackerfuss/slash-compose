@@ -65,6 +65,7 @@ The tool should:
 - Don't lose context between quotes when a param expects the argument to be wrapped in quotations
 - The `executeCommand` command property should support returning a promise to perform async tasks (like picking from a list of options, fetching data from an API, or displaying a form that allows the user to create a new command)
 - The Slash instance should be passed to `executeCommand` so that a command execution has the option to modify the instance in some way (add/remove a command, unmount, etc.)
+- I didn't thoroughly test asynchronously adding or removing commands from an initialized Slash instance
 - Better error and validation handling would improve the user experience. For example, in the demo, if you type something like `/add 1 foo`, the command becomes invalid when you're cursored over "foo", and it doesn't tell you it expects that to be a number instead of a string.
 - Slash suggestions while you're typing would be awesome
 - Better hook support without overriding default tooltip completely
