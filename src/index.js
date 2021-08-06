@@ -1,22 +1,23 @@
-const NUMBER_ARG_REGEX_PARTIAL = "[0-9]+";
-const WORD_ARG_REGEX_PARTIAL = '[^" /]*';
-const QUOTED_ARG_REGEX_PARTIAL = '"[^/"]*"';
-const SENTENCE_ARG_REGEX_PARTIAL = ".*";
+const NUMBER_PARAM_REGEX_PARTIAL = "[0-9]+";
+const WORD_PARAM_REGEX_PARTIAL = '[^" /]*';
+const QUOTED_PARAM_REGEX_PARTIAL = '"[^/"]*"';
+const SENTENCE_PARAM_REGEX_PARTIAL = ".*";
 
 const commands = [
   {
     id: "add",
     description: "Add two numbers together",
-    arguments: [
+    params: [
       {
-        match: NUMBER_ARG_REGEX_PARTIAL,
+        match: NUMBER_PARAM_REGEX_PARTIAL,
         id: "a"
       },
       {
-        match: NUMBER_ARG_REGEX_PARTIAL,
+        match: NUMBER_PARAM_REGEX_PARTIAL,
         id: "b"
       }
-    ]
+    ],
+    onComplete: (context) => {}
   },
   {
     id: "shout",
@@ -25,13 +26,13 @@ const commands = [
   {
     id: "repeat",
     description: "Repeat a phrase n times",
-    arguments: [
+    params: [
       {
-        match: NUMBER_ARG_REGEX_PARTIAL,
+        match: NUMBER_PARAM_REGEX_PARTIAL,
         id: "count"
       },
       {
-        match: QUOTED_ARG_REGEX_PARTIAL,
+        match: QUOTED_PARAM_REGEX_PARTIAL,
         id: "phrase"
       }
     ]
@@ -39,9 +40,9 @@ const commands = [
   {
     id: "hello",
     description: "Say hello!",
-    arguments: [
+    params: [
       {
-        match: WORD_ARG_REGEX_PARTIAL,
+        match: WORD_PARAM_REGEX_PARTIAL,
         id: "name"
       }
     ]
@@ -49,9 +50,9 @@ const commands = [
   {
     id: "upper-all",
     description: "Uppercase everything",
-    arguments: [
+    params: [
       {
-        match: SENTENCE_ARG_REGEX_PARTIAL,
+        match: SENTENCE_PARAM_REGEX_PARTIAL,
         id: "sentence"
       }
     ]
@@ -66,7 +67,8 @@ const show = document.querySelector("span");
 const input = document.querySelector("textarea");
 
 // trims the value so we're only looking at the command ID
-const normalizeFoundCmdStr = (value) => value.replace("/", "").replace(" ", "");
+const normalizeFoundCommandString = (value) =>
+  value.replace("/", "").replace(" ", "");
 
 const getPreString = (str, pos) => str.substring(0, pos);
 const getPostString = (str, pos) => str.substring(pos);
@@ -84,32 +86,34 @@ const findRawFocusedCommandString = (str, pos) => {
   const postText = post ? post[0] : "";
 
   // stick em together
-  const concatenatedCmdStr = `${preText}${postText}`;
+  const concatenatedCommandString = `${preText}${postText}`;
 
   // check if formatted like command because
   // we only check for a starting slash in `pre`
   // and may have only found a value in `post`
-  const isFormattedLikeCmd = concatenatedCmdStr.startsWith("/");
+  const isFormattedLikeCommand = concatenatedCommandString.startsWith("/");
 
-  if (isFormattedLikeCmd) {
+  if (isFormattedLikeCommand) {
     const commandIndex = pos - preText.length;
     return {
-      id: normalizeFoundCmdStr(concatenatedCmdStr),
+      id: normalizeFoundCommandString(concatenatedCommandString),
       startPos: commandIndex
     };
   }
 
   // next, handle if there is a fully declared command
   // before our cursor position
-  const fullyDeclaredCmdsBeforePosition = preStr.match(/\/[a-zA-Z0-9-_]* /g);
+  const fullyDeclaredCommandsBeforePosition = preStr.match(
+    /\/[a-zA-Z0-9-_]* /g
+  );
 
-  if (fullyDeclaredCmdsBeforePosition) {
+  if (fullyDeclaredCommandsBeforePosition) {
     // we only want the most recent command declared
-    const [lastCmdStr] = fullyDeclaredCmdsBeforePosition.slice(-1);
-    const startPos = preStr.lastIndexOf(lastCmdStr);
+    const [lastCommandString] = fullyDeclaredCommandsBeforePosition.slice(-1);
+    const startPos = preStr.lastIndexOf(lastCommandString);
 
     return {
-      id: normalizeFoundCmdStr(lastCmdStr),
+      id: normalizeFoundCommandString(lastCommandString),
       startPos
     };
   }
@@ -117,7 +121,56 @@ const findRawFocusedCommandString = (str, pos) => {
   return null;
 };
 
-const getSlashCommand = (str, pos) => {
+// this prepares each param's `match` regex partials
+// with whitespace and parens according to their position
+// in the param list
+const prepareParamRegexPartialList = (params = []) => {
+  const list = params.map((param, i) => {
+    // default to case where param is not first or last
+    let match = `(${param.match})? ?`;
+    // handle last param case next. If it's the only param,
+    // this will get overridden in the next condition
+    if (i === params.length - 1) {
+      match = `(${param.match})?`;
+    }
+    // finally, handle the first param case
+    if (i === 0) {
+      match = ` ?(${param.match})? ?`;
+    }
+
+    return match;
+  });
+
+  return list.join("");
+};
+
+const mapCommandGroupMatches = (command, matches) => {
+  // shift the first match, it's the complete command
+  // group string, including command and any args.
+  const full = matches.shift();
+  let data = null;
+  let isValid = true;
+
+  // if this command has params,
+  // map them to the remaining match array items
+  if (command.params) {
+    data = command.params.map((param, i) => {
+      // if any one these matches are falsey,
+      // flag `isValid` so the UI can disallow
+      // command completion
+      if (!matches[i]) isValid = false;
+      return { id: param.id, value: matches[i] };
+    });
+  }
+
+  return {
+    full,
+    isValid,
+    data
+  };
+};
+
+const getCommandContext = (str, pos) => {
   const info = findRawFocusedCommandString(str, pos);
 
   if (!info) return null;
@@ -126,52 +179,42 @@ const getSlashCommand = (str, pos) => {
 
   if (!command) return null;
 
-  // this wraps each argument's `match` regex partials
-  // with whitespace and parens according to their position
-  // in the arg list
-  const argRegexList = (command.arguments || []).map((arg, i) => {
-    // default to case where arg is not first or last
-    let match = `(${arg.match})? ?`;
-    // handle last arg case next. If it's the only arg,
-    // this will get overridden in the next condition
-    if (i === command.arguments.length - 1) {
-      match = `(${arg.match})?`;
-    }
-    // finally, handle the first arg case
-    if (i === 0) {
-      match = ` ?(${arg.match})? ?`;
-    }
+  const paramsRegex = prepareParamRegexPartialList(command.params);
+  const commandGroupRegex = new RegExp(`^/${info.id}${paramsRegex}`);
+  const commandGroupMatches = str
+    .substring(info.startPos)
+    .match(commandGroupRegex);
 
-    return match;
-  });
+  if (commandGroupMatches) {
+    const match = mapCommandGroupMatches(command, commandGroupMatches);
 
-  const argRegex = argRegexList.join("");
-  console.log(argRegex);
+    const endPos = info.startPos + match.full.length;
 
-  const idAndArgsRegex = new RegExp(`^/${info.id}${argRegex}`);
-  console.log(idAndArgsRegex);
-  const slashChainList = str.substring(info.startPos).match(idAndArgsRegex);
-
-  if (slashChainList) {
-    const slashChain = slashChainList[0];
-    console.log(slashChainList);
-    const endPos = info.startPos + slashChain.length;
-
+    // if the text cursor is after the possible bounds of
+    // the match, we shouldn't let them operate on it.
     if (pos > endPos) {
       return null;
     }
 
-    return command;
+    const context = {
+      preString: getPreString(str, info.startPos),
+      postString: getPostString(str, endPos),
+      match,
+      command
+    };
+
+    return context;
   }
 };
 
 const showWord = (e) => {
   let text = "";
   const { value, selectionStart } = e.target;
-  const command = getSlashCommand(value, selectionStart);
+  const context = getCommandContext(value, selectionStart);
 
-  if (command) {
-    text = `/${command.id} ${createArgumentDefinition(command.arguments)} (${
+  if (context) {
+    const { command } = context;
+    text = `/${command.id} ${createParamDefinition(command.params)} (${
       command.description
     })`;
   }
@@ -183,9 +226,11 @@ if (input) {
   input.addEventListener("keyup", showWord);
 }
 
-const createArgumentDefinition = (args = []) =>
-  args.reduce(
+const createParamDefinition = (params = []) =>
+  params.reduce(
     (acc, curr, index) =>
-      `${acc}[${curr.name || curr.id}]${args.length !== index + 1 ? " " : ""}`,
+      `${acc}[${curr.name || curr.id}]${
+        params.length !== index + 1 ? " " : ""
+      }`,
     ""
   );
