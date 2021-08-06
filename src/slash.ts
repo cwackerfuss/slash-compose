@@ -1,18 +1,11 @@
-import {
-  createParamHints,
-  findRawCommandString,
-  parseCommandContext
-} from "./slash-utils";
-import { Command, CommandContext } from "./types";
-
-type SlashOptions = {
-  commands: Command[];
-  target: HTMLTextAreaElement | HTMLInputElement;
-};
+import { defaultOnContextChange } from "./on-context-change";
+import { findRawCommandString, parseCommandContext } from "./slash-utils";
+import { Command, CommandContext, SlashOptions } from "./types";
 
 export function Slash(options: SlashOptions) {
   let target = options.target;
   let commands = options.commands;
+  let onContextChange = options.onContextChange || defaultOnContextChange;
   let currentContext: CommandContext = null;
 
   this.init = function () {
@@ -27,24 +20,18 @@ export function Slash(options: SlashOptions) {
   };
 
   this.onTrigger = (e) => {
-    let text = "";
     const { value, selectionStart } = e.target;
     currentContext = this.getCommandContext(value, selectionStart);
 
     if (currentContext) {
-      const {
-        command,
-        match: { isValid }
-      } = currentContext;
-      text = `/${command.id} ${createParamHints(command.params)} (${
-        command.description
-      }) - ${isValid ? "Tab to apply" : "Not ready..."}`;
-      console.log(text);
-      target.addEventListener("keydown", this.completeCommand);
+      if (currentContext.match.isValid) {
+        target.addEventListener("keydown", this.executeCommand);
+      }
     } else {
-      target.removeEventListener("keydown", this.completeCommand);
+      target.removeEventListener("keydown", this.executeCommand);
     }
-    // show.innerText = text;
+
+    onContextChange(currentContext, target);
   };
 
   this.getCommandContext = (
@@ -62,14 +49,25 @@ export function Slash(options: SlashOptions) {
     return parseCommandContext(command, raw);
   };
 
-  this.completeCommand = (e) => {
-    if (e.which === 9) {
+  // event that runs when
+  this.executeCommand = (e) => {
+    if (e.keyCode === 9) {
       e.preventDefault();
-      const update = currentContext.command.onComplete(currentContext);
+      const update = currentContext.command.executeCommand(currentContext);
       if (!update) return;
 
-      const { pre, post, replacement } = update;
+      const {
+        // default to existing string partials
+        // if these are undefined since it's a
+        // better DX to not require these to be
+        // passed in the update.
+        pre = currentContext.stringPartials.pre,
+        post = currentContext.stringPartials.post,
+        replacement
+      } = update;
+      // set the actual input value!
       target.value = `${pre}${replacement}${post}`;
+      // set the updated cursor position
       target.selectionEnd = pre.length + `${replacement}`.length;
     }
   };

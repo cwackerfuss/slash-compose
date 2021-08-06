@@ -1,16 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Parcel Sandbox</title>
+    <title>Slash Compose Demo</title>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" href="src/styles.css" />
   </head>
 
   <body>
-    <span></span>
-    <br />
-    <textarea style="font-size: 30px;">
-In computer science, /add an x-fast trie /add is a data structure for storing integers from a bounded domain. It supports exact and predecessor or successor queries in time O(log log M), using O(n log M) space, where n is the number of stored values and M is the maximum value in the domain. The structure was proposed by Dan Willard in 1982,[1] along with the more complicated y-fast trie, as a way to improve the space usage of van Emde Boas trees, while retaining the O(log log M) query time. </textarea
-    >
+    <div class="container">
+      <h1>Slash Compose Demo</h1>
+      <p>
+        A small library written in vanilla Typescript that enables customizable
+        slash commands in any input field!
+      </p>
+      <textarea id="hey"></textarea>
+
+      <h3>
+        Try some commands:
+      </h3>
+      <ul>
+        <li><code>add</code> - Add two numbers together</li>
+        <li><code>repeat</code> - Repeats a string n number of times</li>
+        <li><code>upperWordBefore</code> - Uppercase the previous word</li>
+        <li><code>upper</code> - Uppercase everything after the command</li>
+        <li><code>surprise</code> - Roll the dice!</li>
+      </ul>
+    </div>
 
     <script src="src/index.ts"></script>
   </body>

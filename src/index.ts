@@ -22,27 +22,13 @@ const commands: Command[] = [
         accessor: (val: string) => +val
       }
     ],
-    onComplete: (context) => {
-      const {
-        stringPartials: { pre, post },
-        match: { data }
-      } = context;
-
-      return {
-        replacement: data[0].value + data[1].value,
-        pre,
-        post
-      };
-    }
-  },
-  {
-    id: "shout",
-    description: "Shout from the rooftops",
-    onComplete: (context) => null
+    executeCommand: (ctx) => ({
+      replacement: ctx.match.data[0].value + ctx.match.data[1].value
+    })
   },
   {
     id: "repeat",
-    description: "Repeat a phrase n times",
+    description: 'Repeat a phrase n times (ex. /repeat 3 "hey "',
     params: [
       {
         match: NUMBER_PARAM_REGEX_PARTIAL,
@@ -55,32 +41,12 @@ const commands: Command[] = [
         accessor: (val) => val.replace(/"/g, "")
       }
     ],
-    onComplete: (context) => {
-      const {
-        stringPartials: { pre, post },
-        match: { data }
-      } = context;
-
-      return {
-        replacement: data[1].value.repeat(data[0].value),
-        pre,
-        post
-      };
-    }
+    executeCommand: (ctx) => ({
+      replacement: ctx.match.data[1].value.repeat(ctx.match.data[0].value)
+    })
   },
   {
-    id: "hello",
-    description: "Say hello!",
-    params: [
-      {
-        match: WORD_PARAM_REGEX_PARTIAL,
-        id: "name"
-      }
-    ],
-    onComplete: (context) => null
-  },
-  {
-    id: "upper-all",
+    id: "upper",
     description: "Uppercase everything",
     params: [
       {
@@ -88,7 +54,31 @@ const commands: Command[] = [
         id: "sentence"
       }
     ],
-    onComplete: (context) => null
+    executeCommand: (ctx) => ({
+      replacement: ctx.match.data[0].value.toUpperCase()
+    })
+  },
+  {
+    id: "upperWordBefore",
+    description: "Uppercase a previous word",
+    executeCommand: (ctx) => {
+      const match = ctx.stringPartials.pre.replace(/\b(\w+) *$/, (v) =>
+        v.toUpperCase()
+      );
+
+      return {
+        replacement: "",
+        pre: match
+      };
+    }
+  },
+  {
+    id: "surprise",
+    description: "roll the dice",
+    executeCommand: () => ({
+      replacement:
+        "We're no strangers to love, You know the rules and so do I, A full commitment's what I'm thinking of, You wouldn't get this from any other guy, I just wanna tell you how I'm feeling, Gotta make you understand, Never gonna give you up, Never gonna let you down, Never gonna run around and desert you, Never gonna make you cry, Never gonna say goodbye, Never gonna tell a lie and hurt you"
+    })
   }
 ];
 

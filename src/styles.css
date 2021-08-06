@@ -1,3 +1,41 @@
 body {
+  font-family: "Helvetica";
+}
+
+input,
+textarea {
+  width: 100%;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px #efefef;
+  outline: none;
+  transition: 0.1s;
+  padding: 1rem;
+  height: 100px;
+  margin: 3rem auto;
+  display: block;
+  border-radius: 1rem;
   font-family: sans-serif;
+  font-size: 1.5rem;
+}
+
+input:focus,
+textarea:focus {
+  box-shadow: 0 0 3px 2px cornflowerblue;
+}
+
+.container {
+  max-width: 500px;
+  margin: 5rem auto 0;
+}
+
+code {
+  background-color: #efefef;
+  padding: 2px 5px;
+  border-radius: 2px;
+  color: #424242;
+}
+
+ul li {
+  margin-bottom: 0.75rem;
 }

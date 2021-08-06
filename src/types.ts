@@ -5,16 +5,16 @@ export type CommandParam = {
 };
 
 export type CommandUpdate = {
-  pre: string;
   replacement: string;
-  post: string;
+  pre?: string;
+  post?: string;
 };
 
 export type Command = {
   id: string;
   description: string;
   params?: CommandParam[];
-  onComplete: (ctx: CommandContext) => CommandUpdate | null;
+  executeCommand: (ctx: CommandContext) => CommandUpdate | null;
 };
 
 export type CommandMatch = {
@@ -38,4 +38,17 @@ export type RawCommandData = {
   startPos: number;
   inputText: string;
   cursorPos: number;
+};
+
+export type SlashTarget = HTMLTextAreaElement | HTMLInputElement;
+
+export type OnContextChangeFn = (
+  ctx: CommandContext | null,
+  target: SlashTarget
+) => void;
+
+export type SlashOptions = {
+  commands: Command[];
+  target: SlashTarget;
+  onContextChange?: OnContextChangeFn;
 };
