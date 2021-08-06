@@ -1,4 +1,4 @@
-# compose-slash
+# slash-compose
 
 A small library written in vanilla Typescript that enables customizable slash commands in any input field!
 
