@@ -21,9 +21,36 @@ A small library written in vanilla Typescript that enables customizable slash co
 
 ## How to use
 
-- Define some commands
-- Call `Slash()` on a field, for example:
-  - `Slash({ commands, target: document.querySelector("textarea") })`
+First, define some commands. For example, here's a command array with a simple command defined:
+```
+const commands: Command[] = [
+  {
+    id: "greeting",
+    description: "Say hello to someone",
+    params: [
+      {
+        match: ".*",
+        id: "name"
+      }
+    ],
+    executeCommand: (ctx) => ({
+      replacement: `Hello, ${ctx.match.data[0].value}!`
+    })
+  }
+]
+```
+
+Next, call `Slash()` with your commands and a target:
+```
+Slash({ commands, target: document.querySelector("textarea") })
+```
+
+Call a command by typing it into your input field with a slash in front:
+```
+/greeting Wilson
+```
+
+If your parameters are valid, you should be able to press `tab` and watch the above text be automatically replaced with "Hello, Wilson!"
 
 ### Command model
 
