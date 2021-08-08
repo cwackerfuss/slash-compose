@@ -177,10 +177,12 @@ The tool should:
 ## Tradeoffs
 
 - I debated between using a JS map, object, or array of objects for the command params. A JS map would have been the best of both worlds since it's ordered and you can reference keys easily, but it's a little arcane for most developers. I went with an array, but I'd like to experiment with an object for better typescript type support.
-- The implementation relies heavily on regex for contextualizing where the user has their cursor and which command is relevant. It may be because Regex is just intimidating, but I feel there are likely edgecases that break the code that I haven't discovered.
+- The implementation relies heavily on regex for contextualizing where the user has their cursor and which command is relevant. Regex is just eternally slightly intimidating and there may be edgecases that break the code that I haven't discovered.
 
 ## Future Improvements
 
+- Tests
+- Inform the change handler whether or not the command context changed active commands since the last run (to optimize in case you only want to trigger some action when the command first becomes active)
 - Add an "example" field to the Command Param model so that it's more clear how params should be formatted
 - Don't lose context between quotes when a param expects the argument to be wrapped in quotations
 - The `executeCommand` command property should support returning a promise to perform async tasks (like picking from a list of options, fetching data from an API, or displaying a form that allows the user to create a new command)
