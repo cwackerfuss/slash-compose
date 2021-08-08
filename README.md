@@ -56,18 +56,35 @@ If your parameters are valid, you should be able to press `tab` and watch the ab
 
 A command has the following properties:
 
-- `id: string`: the string a user must type to initialize this command
-- `description: string`: a human readable description of what the command does
-- `params: CommandParam[]`: an optional list of params that this command accepts. Optional
-- `executeCommand: (CommandContext) => CommandUpdate | null`: function that's called when you tab to complete and allows for updating the text.
+- `id`: the string a user must type to initialize this command
+- `description`: a human readable description of what the command does
+- `params`: an optional list of params that this command accepts. Optional
+- `executeCommand`: function that's called when you tab to complete and allows for updating the text.
+
+```
+type Command = {
+  id: string;
+  description: string;
+  params?: CommandParam[];
+  executeCommand: (ctx: CommandContext) => CommandUpdate | null;
+};
+```
 
 ### Command Param model
 
 A command can include a parameter modeled like so:
 
-- `match: string`: a regex match
-- `id: string`: the human readable name of this param
-- `accessor: (string) => any`: modify the value before passing it to the match context. (e.g. take a stringified number and convert it to a number) Optional
+- `match`: a regex match
+- `id`: the human readable name of this param
+- `accessor`: modify the value before passing it to the match context. (e.g. take a stringified number and convert it to a number) Optional
+
+```
+type CommandParam = {
+  match: string;
+  id: string;
+  accessor?: (val: string) => unknown;
+};
+```
 
 ## Requirements
 
