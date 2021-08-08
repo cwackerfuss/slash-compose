@@ -172,3 +172,7 @@ export const parseCommandContext = (
     return context;
   }
 };
+
+export const findCommandById = (commands: Command[], commandId: string) => (
+  commands.find((c) => c.id.toLowerCase() === commandId.toLowerCase())
+)

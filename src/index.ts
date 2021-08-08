@@ -1,4 +1,5 @@
-import { Slash } from "./slash";
+import { defaultOnContextChange } from "./on-context-change";
+import Slash from "./slash";
 import { Command } from "./types";
 
 const NUMBER_PARAM_REGEX_PARTIAL = "[0-9]+";
@@ -6,6 +7,7 @@ const WORD_PARAM_REGEX_PARTIAL = '[^" /]*';
 const QUOTED_PARAM_REGEX_PARTIAL = '"[^/"]*"';
 const SENTENCE_PARAM_REGEX_PARTIAL = ".*";
 
+// define some commands
 const commands: Command[] = [
   {
     id: "add",
@@ -82,4 +84,23 @@ const commands: Command[] = [
   }
 ];
 
-Slash({ commands, target: document.querySelector("textarea") });
+// initialize Slash
+const slash = new Slash({ commands, target: document.querySelector("textarea") });
+
+// add a command after initialization
+slash.addCommand({
+  id: "greeting",
+  description: "Say hello to someone",
+  params: [
+    {
+      match: ".*",
+      id: "name"
+    }
+  ],
+  executeCommand: (ctx) => ({
+    replacement: `Hello, ${ctx.match.data[0].value}!`
+  })
+})
+
+// remove a command after initialization
+slash.removeCommand('greeting')

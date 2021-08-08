@@ -8,7 +8,9 @@ let tooltipInstance: Instance;
 const getTooltipInstance = (target: SlashTarget) => {
   if (tooltipInstance) return tooltipInstance;
 
-  tooltipInstance = tippy(target);
+  tooltipInstance = tippy(target, {
+    trigger: 'manual',
+  });
 
   return tooltipInstance;
 };
@@ -18,9 +20,8 @@ const createTooltipText = ({ command, match }: CommandContext) =>
     command.description
   }) - ${match.isValid ? "Tab to apply" : "Add more args..."}`;
 
-export const defaultOnContextChange: OnContextChangeFn = (ctx, target) => {
+export const defaultOnContextChange: OnContextChangeFn = (target, ctx) => {
   const tooltip = getTooltipInstance(target);
-
   if (!ctx) {
     tooltip.hide();
   } else {

@@ -43,8 +43,8 @@ export type RawCommandData = {
 export type SlashTarget = HTMLTextAreaElement | HTMLInputElement;
 
 export type OnContextChangeFn = (
-  ctx: CommandContext | null,
-  target: SlashTarget
+  target: SlashTarget,
+  ctx: CommandContext | null
 ) => void;
 
 export type SlashOptions = {

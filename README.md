@@ -40,9 +40,9 @@ const commands: Command[] = [
 ]
 ```
 
-Next, call `Slash()` with your commands and a target:
+Next, initialize a new Slash instance with your commands and a target:
 ```
-Slash({ commands, target: document.querySelector("textarea") })
+const slash = new Slash({ commands, target: document.querySelector("textarea") })
 ```
 
 Call a command by typing it into your input field with a slash in front:
@@ -56,15 +56,19 @@ If your parameters are valid, you should be able to press `tab` and watch the ab
 
 As shown above, initializing `Slash` on a field is as easy as passing the function a target and some commands. When you call `Slash`, it also returns the Slash instance so that you can call additional methods on it.
 
+Available options:
+
+- `commands`: the initial command set
+- `target`: the field you want to integrate Slash with
+- `onContextChange`: an optional function that allows you to specify your own context change behavior.
+
 ```
-type Slash = ({
+type SlashOptions = {
   commands: Command[];
   target: SlashTarget;
   onContextChange?: OnContextChangeFn;
-}) => SlashInstance
+}
 ```
-
-
 
 ### Command model
 
@@ -84,7 +88,7 @@ type Command = {
 };
 ```
 
-### Command Param model
+### Command - param
 
 A command can include a parameter modeled like so:
 
@@ -100,10 +104,64 @@ type CommandParam = {
 };
 ```
 
+### Command - executeCommand
+
+When a command is executed by the user, Slash passes the `CommandContext` object (documented below) as an argument to the command's `executeCommand` function. This object contains all the data you may need to update the text however you see fit.
+
+To actually update the text for the user, return an object that represents the new state of the text field:
+- `replacement`: the text that will replace the complete command text, including arguments
+- `pre`: all text that comes _before_ the command text. Optional; if left undefined, the current text will not be affected.
+- `post`: all text that comes _after_ the command text. Optional; like `pre`, if left undefined, the current text will not be affected.
+
+```
+type CommandUpdate = {
+  replacement: string;
+  pre?: string;
+  post?: string;
+};
+```
+
+*What happens after the `executeCommand` function completes?*
+Slash combines pre, post, and replacement values from above to create the updated text value, and then repositions the user's cursor to the appropriate position.
+
+### Command Context
+
+The Command Context represents the current contextual state of your Slash instance, including:
+- `command`: the command (if any) that is currently active under the user's text cursor
+- `match`:
+  - `full`: the complete command text, including the command and any arguments
+  - `isValid`: whether or not the command's arguments are valid based on each param's `match` property
+  - `data`: an array of parsed arguments and their ID's. Includes both the raw input value and the value returned from the param's `accessor` if one is defined.
+- `raw`: general data regarding the user's current position in relation to the active command
+- `stringPartials`: easy access to both the `pre` and `post` parsed values.
+
+If no command is currently active, `onContextChange` will be called with `null` instead of the command context.
+
+Here's what it looks like:
+```
+type CommandContext = {
+  command: Command;
+  match: {
+    full: string;
+    isValid: boolean;
+    data: { id: string; value: unknown; rawValue: string } | null;
+  };
+  raw: {
+    id: string;
+    startPos: number;
+    inputText: string;
+    cursorPos: number;
+  };
+  stringPartials: {
+    pre: string;
+    post: string;
+  };
+};
+```
+
 ## Requirements
 
 The tool should:
-
 - Support both parameter-based execution and generalized execution on the entire text contents.
 - Give the user feedback on what a typed slash command does and which parameters it accepts, if any.
 - Allow developer to manage which commands are available to the user.

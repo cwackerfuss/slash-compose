@@ -1,62 +1,55 @@
 import { defaultOnContextChange } from "./on-context-change";
-import { findRawCommandString, parseCommandContext } from "./slash-utils";
-import { Command, CommandContext, SlashOptions } from "./types";
+import { findCommandById, findRawCommandString, parseCommandContext } from "./slash-utils";
+import { Command, CommandContext, OnContextChangeFn, SlashOptions, SlashTarget } from "./types";
 
-export function Slash(options: SlashOptions) {
-  let target = options.target;
-  let commands = options.commands;
-  let onContextChange = options.onContextChange || defaultOnContextChange;
-  let currentContext: CommandContext = null;
+export default class Slash {
+  currentContext: CommandContext = null
+  target: SlashTarget
+  commands: Command[] = []
+  onContextChange: OnContextChangeFn
+ 
+  constructor(options: SlashOptions) {
+    this.target = options.target
+    this.commands = options.commands
+    this.onContextChange = options.onContextChange || defaultOnContextChange
+    this.target.addEventListener("click", this.onTargetEvent);
+    this.target.addEventListener("keyup", this.onTargetEvent);
+  }
 
-  this.init = function () {
-    target.addEventListener("click", this.onTrigger);
-    target.addEventListener("keyup", this.onTrigger);
-
-    return this;
-  };
-
-  this.findCommand = (value: string) => {
-    return commands.find((c) => c.id.toLowerCase() === value.toLowerCase());
-  };
-
-  this.onTrigger = (e) => {
-    const { value, selectionStart } = e.target;
-    currentContext = this.getCommandContext(value, selectionStart);
+  onTargetEvent = (e) => {
+    const { value, selectionStart} = e.target
+    this.currentContext = this.getCommandContext(value, selectionStart);
 
     // if there's a command that can be run,
     // allow the user to execute the command,
     // otherwise unmount the event listener
-    if (currentContext && currentContext.match.isValid) {
-      target.addEventListener("keydown", this.executeCommand);
+    if (this.currentContext && this.currentContext.match.isValid) {
+      this.target.addEventListener("keydown", this.executeCommand);
     } else {
-      target.removeEventListener("keydown", this.executeCommand);
+      this.target.removeEventListener("keydown", this.executeCommand);
     }
-
-    onContextChange(currentContext, target);
-  };
+    this.onContextChange(this.target, this.currentContext);
+  }
 
   // find the relevant command based on user cursor position,
   // and assemble any data we may need to process the command
-  this.getCommandContext = (
-    inputText: string,
-    cursorPos: number
-  ): CommandContext | null => {
+  getCommandContext = (inputText: string, cursorPos: number) => {
     const raw = findRawCommandString(inputText, cursorPos);
 
     if (!raw) return null;
 
-    const command = this.findCommand(raw.id);
+    const command = findCommandById(this.commands, raw.id);
 
     if (!command) return null;
 
     return parseCommandContext(command, raw);
-  };
+  }
 
   // event that runs when user executes command
-  this.executeCommand = (e) => {
+  executeCommand = (e) => {
     if (e.keyCode === 9) {
       e.preventDefault();
-      const update = currentContext.command.executeCommand(currentContext);
+      const update = this.currentContext.command.executeCommand(this.currentContext);
       if (!update) return;
 
       const {
@@ -64,24 +57,22 @@ export function Slash(options: SlashOptions) {
         // if these are undefined since it's a
         // better DX to not require these to be
         // passed in the update.
-        pre = currentContext.stringPartials.pre,
-        post = currentContext.stringPartials.post,
+        pre = this.currentContext.stringPartials.pre,
+        post = this.currentContext.stringPartials.post,
         replacement
       } = update;
       // set the actual input value!
-      target.value = `${pre}${replacement}${post}`;
+      this.target.value = `${pre}${replacement}${post}`;
       // set the updated cursor position
-      target.selectionEnd = pre.length + `${replacement}`.length;
+      this.target.selectionEnd = pre.length + `${replacement}`.length;
     }
   };
 
-  this.addCommand = (command: Command) => {
+  addCommand = (command: Command) => {
     this.commands.push(command);
   };
 
-  this.removeCommand = (commandId: string) => {
+  removeCommand = (commandId: string) => {
     this.commands = this.commands.filter((c) => c.id !== commandId);
   };
-
-  return this.init();
 }
