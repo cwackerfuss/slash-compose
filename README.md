@@ -52,6 +52,20 @@ Call a command by typing it into your input field with a slash in front:
 
 If your parameters are valid, you should be able to press `tab` and watch the above text be automatically replaced with "Hello, Wilson!"
 
+### The `Slash` instance
+
+As shown above, initializing `Slash` on a field is as easy as passing the function a target and some commands. When you call `Slash`, it also returns the Slash instance so that you can call additional methods on it.
+
+```
+type Slash = ({
+  commands: Command[];
+  target: SlashTarget;
+  onContextChange?: OnContextChangeFn;
+}) => SlashInstance
+```
+
+
+
 ### Command model
 
 A command has the following properties:
