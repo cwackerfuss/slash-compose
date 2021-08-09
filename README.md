@@ -15,6 +15,20 @@ A small library written in vanilla Typescript that enables customizable slash co
 - Override the change handler to trigger your own behavior.
 - Dependency free (okay, Tippy is used in the demo for the default tooltip but that can easily be abstracted out)
 
+## Requirements
+
+- Support both parameter-based execution and generalized execution on the entire text contents.
+- Give the user feedback on what a typed slash command does and which parameters it accepts, if any.
+- Allow developer to manage which commands are available to the user.
+- Give the developer control over the `onContextChange` handler to manage their own custom tooltip display, but provide a nice default.
+
+## Assumptions
+
+- A slash command should support variable number of parameters
+- A slash command does not contain spaces
+- A slash command could be typed and executed from the beginning, middle, or end of the text contents, and there may be multiple slash commands in the contents at once, but only one should ever be executable at any time.
+- The library is built to be initialized on editable plaintext content and has only been tested in a textarea element.
+
 ## Run the demo
 
 - Download project, then `npm i` and `npm run start`
@@ -158,21 +172,6 @@ type CommandContext = {
   };
 };
 ```
-
-## Requirements
-
-The tool should:
-- Support both parameter-based execution and generalized execution on the entire text contents.
-- Give the user feedback on what a typed slash command does and which parameters it accepts, if any.
-- Allow developer to manage which commands are available to the user.
-- Give the developer control over the `onContextChange` handler to manage their own custom tooltip display, but provide a nice default.
-
-## Assumptions
-
-- A slash command should support variable number of parameters
-- A slash command does not contain spaces
-- A slash command could be typed and executed from the beginning, middle, or end of the text contents, and there may be multiple slash commands in the contents at once, but only one should ever be executable at any time.
-- The library is built to be initialized on editable plaintext content and has only been tested in a textarea element.
 
 ## Tradeoffs
 
