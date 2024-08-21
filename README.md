@@ -1,8 +1,6 @@
 # slash-compose
 
-A small library written in vanilla Typescript that enables customizable slash commands in any input field!
-
-[Check out the demo](https://zealous-noether-a01651.netlify.app/)
+A small library written in vanilla Typescript that enables customizable slash commands in any input field.
 
 ## Features
 
